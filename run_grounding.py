@@ -639,6 +639,8 @@ def main():
                         help="Whether to freeze word embeddings in Bert")
 
     # param for dataset
+    parser.add_argument("--use_gebd", default=False, type=bool,
+                        help="The max length of caption tokens.")
     parser.add_argument("--max_token_length", default=90, type=int,
                         help="The max length of caption tokens.")
     parser.add_argument("--max_frame_num", default=10, type=int,
@@ -680,6 +682,11 @@ def main():
 
     if args.ablation is not None:
         args.ablation = args.ablation.split('-')
+
+    if args.use_gebd:
+        frame_sampling = 'gebd'
+    else:
+        frame_sampling = 'all_1s'
 
     global logger
 
@@ -729,14 +736,14 @@ def main():
         if args.do_test:
             logger.info("Evaluate for LocatingTwoStream after Training")
             test_dataloader = locating2stream_dataloader(args, tokenizer, split='test')
-            test_corpus_dataloader = locating2stream_dataloader(args, tokenizer, split='test', corpus=True, mode='all_1s')
+            test_corpus_dataloader = locating2stream_dataloader(args, tokenizer, split='test', corpus=True, mode=frame_sampling)
             test(args, test_dataloader, test_corpus_dataloader, model, last_checkpoint)
 
     # inference and evaluation
     elif args.do_test or args.do_eval:
         logger.info("Evaluate for LocatingTwoStream")
         test_dataloader = locating2stream_dataloader(args, tokenizer, split='test')
-        test_corpus_dataloader = locating2stream_dataloader(args, tokenizer, split='test', corpus=True, mode='all_1s')
+        test_corpus_dataloader = locating2stream_dataloader(args, tokenizer, split='test', corpus=True, mode=frame_sampling)
 
         if not args.do_eval:
             raise Exception

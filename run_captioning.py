@@ -207,17 +207,16 @@ def train(args, train_dataloader, val_dataloader, model, tokenizer):
                 # evaluation
                 if args.evaluate_during_training:
                     logger.info("Perform evaluation at step: %d" % global_step)
-                    evaluate_file = evaluate(args, val_dataloader, model, tokenizer,
-                                             checkpoint_dir)
-                    with open(evaluate_file, 'r') as f:
-                        res = json.load(f)
-                    best_score = max(best_score, res['CIDEr'])
-                    res['epoch'] = epoch
-                    res['global_step'] = step
-                    res['best_CIDEr'] = best_score
-                    eval_log.append(res)
-                    with open(args.output_dir + '/eval_logs.json', 'w') as f:
-                        json.dump(eval_log, f)
+                    evaluate(args, val_dataloader, model, tokenizer, checkpoint_dir)
+                    # with open(evaluate_file, 'r') as f:
+                    #     res = json.load(f)
+                    # best_score = max(best_score, res['CIDEr'])
+                    # res['epoch'] = epoch
+                    # res['global_step'] = step
+                    # res['best_CIDEr'] = best_score
+                    # eval_log.append(res)
+                    # with open(args.output_dir + '/eval_logs.json', 'w') as f:
+                    #     json.dump(eval_log, f)
     return checkpoint_dir
 
 
@@ -227,20 +226,25 @@ def evaluate(args, val_dataloader, model, tokenizer, output_dir):
     pred_dict = load_pred_cap(predict_file)
     gt_dict = val_dataloader.dataset.get_caption()
 
-    evaluate_file = get_evaluate_file(predict_file)
+    # evaluate_file = get_evaluate_file(predict_file)
     gt = split_gt_parts(gt_dict)
     pred = split_pred_parts(pred_dict)
 
-    res_pred_sub = evaluate_on_caption(pred['subject'], gt['subject'], outfile=evaluate_file)
-    res_pred_bef = evaluate_on_caption(pred['before'], gt['before'], outfile=evaluate_file)
-    res_pred_aft = evaluate_on_caption(pred['after'], gt['after'], outfile=evaluate_file)
+    res_pred_sub = evaluate_on_caption(pred['subject'], gt['subject'])#, outfile=evaluate_file)
+    res_pred_bef = evaluate_on_caption(pred['before'], gt['before'])#, outfile=evaluate_file)
+    res_pred_aft = evaluate_on_caption(pred['after'], gt['after'])#, outfile=evaluate_file)
 
     logger.info('\n ****************** Evaluation Results ******************')
-    logger.info('Subject: ', res_pred_sub)
-    logger.info('Status_Before: ', res_pred_bef)
-    logger.info('Status_After: ', res_pred_aft)
-
-    return evaluate_file
+    logger.info('Subject -- CIDEr: %f, SPICE: %f, ROUGE_L: %f',
+                res_pred_sub['CIDEr'], res_pred_sub['SPICE'], res_pred_sub['ROUGE_L'])
+    logger.info('Status_Before -- CIDEr: %f, SPICE: %f, ROUGE_L: %f',
+                res_pred_bef['CIDEr'], res_pred_bef['SPICE'], res_pred_bef['ROUGE_L'])
+    logger.info('Status_After -- CIDEr: %f, SPICE: %f, ROUGE_L: %f',
+                res_pred_aft['CIDEr'], res_pred_aft['SPICE'], res_pred_aft['ROUGE_L'])
+    logger.info('Average -- CIDEr: %f, SPICE: %f, ROUGE_L: %f',
+                (res_pred_sub['CIDEr'] + res_pred_sub['CIDEr'] + res_pred_sub['CIDEr']) / 3,
+                (res_pred_bef['CIDEr'] + res_pred_bef['CIDEr'] + res_pred_bef['CIDEr']) / 3,
+                (res_pred_aft['CIDEr'] + res_pred_aft['CIDEr'] + res_pred_aft['CIDEr']) / 3)
 
 
 def test(args, test_dataloader, model, tokenizer, predict_file):
@@ -321,7 +325,7 @@ def main():
     parser.add_argument("--do_test", action='store_true', help="Whether to run inference.")
     parser.add_argument("--do_eval", action='store_true', help="Whether to run evaluation.")
     parser.add_argument("--ablation", default=None, help="Ablation set, e.g.'obj-frame'")
-    parser.add_argument('--gpu_ids', type=str, default='3 4 5 6 7')
+    parser.add_argument('--gpu_ids', type=str, default='1 3 4 5 7')
     parser.add_argument("--per_gpu_train_batch_size", default=32, type=int,
                         help="Batch size per GPU/CPU for training.")
     parser.add_argument("--per_gpu_eval_batch_size", default=30, type=int,
@@ -465,12 +469,11 @@ def main():
 
         if not args.do_eval:
             predict_file = get_predict_file(checkpoint, args)
-            predict_file = predict_file[:-4] + 'gebd.json'
             test(args, test_dataloader, model, tokenizer, predict_file)
             logger.info("Prediction results saved to: {}".format(predict_file))
         else:
-            evaluate_file = evaluate(args, test_dataloader, model, tokenizer, checkpoint)
-            logger.info("Evaluation results saved to: {}".format(evaluate_file))
+            evaluate(args, test_dataloader, model, tokenizer, checkpoint)
+            # logger.info("Evaluation results saved to: {}".format(evaluate_file))
 
 
 if __name__ == '__main__':

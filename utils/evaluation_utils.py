@@ -126,9 +126,8 @@ def evaluate_on_caption(pred_dict, gt_dict, outfile=None):
     # SPICE will take a few minutes the first time, but speeds up due to caching
     Eval.evaluate()
     result = Eval.eval
-    if not outfile:
-        print(result)
-    else:
+
+    if outfile:
         with open(outfile, 'w') as fp:
             json.dump(result, fp, indent=4)
     return result
