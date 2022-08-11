@@ -12,8 +12,8 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from utils.basic_utils import set_seed, get_current_timestamp, remove_rows_cols
 from utils.logging_utils import setup_logger
-from utils.evaluation_utils import evaluate_on_locating2stream
-from datasets.grounding_dataset import LocatingTwoStreamDataset, LocatingTwoStreamCorpusDataset, CustomBatchSampler
+from utils.evaluation_utils import evaluate_grounding
+from datasets.grounding_dataset import GroundingDataset, GroundingCorpusDataset, CustomBatchSampler
 from modeling.modeling_bert import BertForVideoRetrieval
 from pytorch_transformers import BertTokenizer, BertConfig, AdamW, WarmupLinearSchedule
 
@@ -155,11 +155,11 @@ def make_data_sampler(dataset, shuffle):
     return sampler
 
 
-def locating2stream_dataloader(args, tokenizer, split, corpus=False, default_shuffle=True, mode='gt'):
+def grounding_dataloader(args, tokenizer, split, corpus=False, default_shuffle=True, mode='gt'):
     if corpus:
-        dataset = LocatingTwoStreamCorpusDataset(args, split, mode)
+        dataset = GroundingCorpusDataset(args, split, mode)
     else:
-        dataset = LocatingTwoStreamDataset(args, tokenizer, split)
+        dataset = GroundingDataset(args, tokenizer, split)
 
     if split == 'train' and default_shuffle:
         shuffle = True
@@ -499,7 +499,7 @@ def validate(args, train_dataloader, train_corpus_dataloader,
         writer.add_scalar('Acc/random_train', random_acc, global_step)
 
 
-def test(args, test_dataloader, test_corpus_dataloader, model, output_dir):
+def test(args, test_dataloader, test_corpus_dataloader, model, output_dir, mode):
     predict_file = get_predict_file(output_dir, args)
     evaluate_file = get_evaluate_file(predict_file)
 
@@ -580,15 +580,15 @@ def test(args, test_dataloader, test_corpus_dataloader, model, output_dir):
                 assert bid not in pred_dict
                 pred_dict[bid] = dict(
                     proposals=[],
-                    score=[],
+                    scores=[],
                     gt=gts[bid[:-1]]['timestamp']
                 )
                 for c_idx in range(len(ctx['pids'])):
                     pred_dict[bid]['proposals'].append(ctx['timestamp'][c_idx])
-                    pred_dict[bid]['score'].append(scores[c_idx])
+                    pred_dict[bid]['scores'].append(scores[c_idx])
 
         vid_lengths = test_dataloader.dataset.get_video_lengths()
-        metric = evaluate_on_locating2stream(pred_dict, vid_lengths, outfile=[predict_file, evaluate_file])
+        metric = evaluate_grounding(pred_dict, vid_lengths, mode, outfile=[predict_file, evaluate_file])
     logger.info("Inference model computing time: {} seconds per batch".format(time_meter / (step + 1)))
     logger.info('Evaluation result: {}'.format(str(metric)))
     logger.info('Evaluation result saved to {}'.format(evaluate_file))
@@ -612,7 +612,7 @@ def main():
     parser.add_argument("--do_test", action='store_true', help="Whether to run inference.")
     parser.add_argument("--do_eval", action='store_true', help="Whether to run evaluation.")
     parser.add_argument("--ablation", default=None, help="Ablation set, e.g.'obj-frame'")
-    parser.add_argument('--gpu_ids', type=str, default='4 5 6 7')
+    parser.add_argument('--gpu_ids', type=str, default='4 6 7')
     parser.add_argument("--per_gpu_train_batch_size", default=48, type=int,
                         help="Batch size per GPU/CPU for training.")
     parser.add_argument("--per_gpu_eval_batch_size", default=144, type=int,
@@ -724,31 +724,31 @@ def main():
     logger.info("Training/evaluation parameters %s", args)
 
     if args.do_train:
-        train_dataloader = locating2stream_dataloader(args, tokenizer, split='train')
-        train_val_dataloader = locating2stream_dataloader(args, tokenizer, split='train', default_shuffle=False)
-        train_corpus_dataloader = locating2stream_dataloader(args, tokenizer, split='train', corpus=True, default_shuffle=False)
-        val_dataloader = locating2stream_dataloader(args, tokenizer, split='val')
-        val_corpus_dataloader = locating2stream_dataloader(args, tokenizer, split='val', corpus=True)
+        train_dataloader = grounding_dataloader(args, tokenizer, split='train')
+        train_val_dataloader = grounding_dataloader(args, tokenizer, split='train', default_shuffle=False)
+        train_corpus_dataloader = grounding_dataloader(args, tokenizer, split='train', corpus=True, default_shuffle=False)
+        val_dataloader = grounding_dataloader(args, tokenizer, split='val')
+        val_corpus_dataloader = grounding_dataloader(args, tokenizer, split='val', corpus=True)
         last_checkpoint = train(args, train_dataloader, train_val_dataloader, train_corpus_dataloader,
                                 val_dataloader, val_corpus_dataloader, model, tokenizer)
 
         # test the last checkpoint after training
         if args.do_test:
-            logger.info("Evaluate for LocatingTwoStream after Training")
-            test_dataloader = locating2stream_dataloader(args, tokenizer, split='test')
-            test_corpus_dataloader = locating2stream_dataloader(args, tokenizer, split='test', corpus=True, mode=frame_sampling)
-            test(args, test_dataloader, test_corpus_dataloader, model, last_checkpoint)
+            logger.info("Evaluate for Grounding after Training")
+            test_dataloader = grounding_dataloader(args, tokenizer, split='test')
+            test_corpus_dataloader = grounding_dataloader(args, tokenizer, split='test', corpus=True, mode=frame_sampling)
+            test(args, test_dataloader, test_corpus_dataloader, model, last_checkpoint, mode=frame_sampling)
 
     # inference and evaluation
     elif args.do_test or args.do_eval:
-        logger.info("Evaluate for LocatingTwoStream")
-        test_dataloader = locating2stream_dataloader(args, tokenizer, split='test')
-        test_corpus_dataloader = locating2stream_dataloader(args, tokenizer, split='test', corpus=True, mode=frame_sampling)
+        logger.info("Evaluate for Grounding")
+        test_dataloader = grounding_dataloader(args, tokenizer, split='test')
+        test_corpus_dataloader = grounding_dataloader(args, tokenizer, split='test', corpus=True, mode=frame_sampling)
 
         if not args.do_eval:
             raise Exception
         else:
-            test(args, test_dataloader, test_corpus_dataloader, model, checkpoint)
+            test(args, test_dataloader, test_corpus_dataloader, model, checkpoint, mode=frame_sampling)
 
 
 if __name__ == '__main__':

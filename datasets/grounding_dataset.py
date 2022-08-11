@@ -23,7 +23,7 @@ def generate_difference(feat_dict, is_action=False):
     return np.array(difference_seq)
 
 
-class LocatingTwoStreamDataset(Dataset):
+class GroundingDataset(Dataset):
     def __init__(self, args, tokenizer, split):
         assert split in ['train', 'test', 'val'], "Invalid split: split must in 'train', 'test' and 'val'."
         self.yaml_file = args.yaml_file
@@ -289,7 +289,7 @@ class LocatingTwoStreamDataset(Dataset):
         return attention_mask
 
 
-class LocatingTwoStreamCorpusDataset(Dataset):
+class GroundingCorpusDataset(Dataset):
     def __init__(self, args, split, mode='gt'):
         assert split in ['train', 'test', 'val'], "Invalid split: split must in 'train', 'test' and 'val'."
         assert mode in ['gt', 'gebd', 'all_1s'], "Invalid mode for corpus dataset"
@@ -589,13 +589,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    dataset = LocatingTwoStreamDataset(args, tokenizer, 'test')
+    dataset = GroundingDataset(args, tokenizer, 'test')
     # dataloader = DataLoader(dataset=dataset, batch_sampler=CustomBatchSampler(batch_size=64, dataset=dataset))
     dataloader = DataLoader(dataset=dataset, sampler=torch.utils.data.sampler.SequentialSampler(dataset), batch_size=1)
     for boundary_ids, batch in tqdm(dataloader):
         a = 1
 
-    dataset = LocatingTwoStreamCorpusDataset(args, 'test', mode='all_1s')
+    dataset = GroundingCorpusDataset(args, 'test', mode='all_1s')
     dataloader = DataLoader(dataset=dataset, batch_size=1, sampler=torch.utils.data.sampler.SequentialSampler(dataset), num_workers=1)
     for boundary_ids, timestamp, batch in tqdm(dataloader):
     # for boundary_ids in tqdm(dataloader):

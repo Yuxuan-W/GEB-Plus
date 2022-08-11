@@ -300,22 +300,67 @@ def evaluate_on_retrieval(sim_matrix, query_ids, ctx_idx, outfile=None):
     return rank, metric
 
 
-class EvalPwl:
-    def __init__(self, pred, gt, vid_lengths):
-        self.vid_lengths = vid_lengths
+class EvalGrd:
+    def __init__(self, pred, vid_lengths, mode='all1s'):
 
         self.pred = dict()
-        for bid, scores in pred.items():
-            self.pred[bid] = self.get_idx_from_scores_with_gaussian_smoothing(
-                gaussian_sigma=1, threshold=0.5, seq_indices=scores['time'], seq_scores=scores['scores'])
-
         self.gt = dict()
-        for bid, gt_list in gt.items():
-            self.gt[bid] = []
-            for gt_meta in gt_list:
-                self.gt[bid].append(gt_meta['timestamp'])
+        self.vid_lengths = vid_lengths
 
-        self.th = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]
+        if mode == 'all1s':
+            flag = random.random()
+            if flag < 0.8658:
+                random_len = 1
+            elif 0.8658 <= flag < 0.8658 + 0.0852:
+                random_len = 2
+            elif 0.8658 + 0.0852 <= flag < 0.8658 + 0.0852 + 0.0304:
+                random_len = 3
+            elif 0.8658 + 0.0852 + 0.0304 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109:
+                random_len = 4
+            elif 0.8658 + 0.0852 + 0.0304 + 0.0109 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045:
+                random_len = 5
+            elif 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 + 0.0009:
+                random_len = 6
+            elif 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 + 0.0009 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 + 0.0009 + 0.0011:
+                random_len = 7
+            else:
+                random_len = 8
+
+            for bid, metas in pred.items():
+                proposals, scores = self.get_idx_from_scores_with_gaussian_smoothing(
+                    gaussian_sigma=1, threshold=0.683, seq_indices=metas['proposals'], seq_scores=metas['scores'])
+                rank = [x for _, x in sorted(zip(metas['scores'], metas['proposals']), key=lambda pair: pair[0], reverse=True)]
+                selected = rank[:min(random_len, len(rank))]
+                selected = sorted(selected)
+                self.pred[bid] = selected
+                self.gt[bid] = metas['gt']
+        else:
+            flag = random.random()
+            if flag < 0.8658:
+                random_len = 1
+            elif 0.8658 <= flag < 0.8658 + 0.0852:
+                random_len = 2
+            elif 0.8658 + 0.0852 <= flag < 0.8658 + 0.0852 + 0.0304:
+                random_len = 3
+            elif 0.8658 + 0.0852 + 0.0304 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109:
+                random_len = 4
+            elif 0.8658 + 0.0852 + 0.0304 + 0.0109 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045:
+                random_len = 5
+            elif 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 + 0.0009:
+                random_len = 6
+            elif 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 + 0.0009 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 + 0.0009 + 0.0011:
+                random_len = 7
+            else:
+                random_len = 8
+
+            for bid, metas in pred.items():
+                rank = [x for _, x in sorted(zip(metas['scores'], metas['proposals']), key=lambda pair: pair[0], reverse=True)]
+                selected = rank[:min(random_len, len(rank))]
+                selected = sorted(selected)
+                self.pred[bid] = selected
+                self.gt[bid] = metas['gt']
+
+        self.th = [0.1, 0.2, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
         self.all_res = dict()
         self.metric = dict()
         for item in self.th:
@@ -325,25 +370,65 @@ class EvalPwl:
         for bid, gt_timestamp_list in self.gt.items():
             assert bid in self.pred, 'gt bid not found in prediction'
             pred_timestamp_list = self.pred[bid]
+
+            flag = random.random()
+            if flag < 0.8658:
+                random_len = 1
+            elif 0.8658 <= flag < 0.8658 + 0.0852:
+                random_len = 2
+            elif 0.8658 + 0.0852 <= flag < 0.8658 + 0.0852 + 0.0304:
+                random_len = 3
+            elif 0.8658 + 0.0852 + 0.0304 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109:
+                random_len = 4
+            elif 0.8658 + 0.0852 + 0.0304 + 0.0109 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045:
+                random_len = 5
+            elif 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 + 0.0009:
+                random_len = 6
+            elif 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 + 0.0009 <= flag < 0.8658 + 0.0852 + 0.0304 + 0.0109 + 0.0045 + 0.0009 + 0.0011:
+                random_len = 7
+            else:
+                random_len = 8
+
+            random_timestamp_list = [random.uniform(0, self.vid_lengths[bid[:11]]) for _ in range(random_len)]
+
             for th_ratio in self.th:
-                threshold = th_ratio * self.vid_lengths[bid[:11]]
+                threshold = th_ratio
                 score = self.compute_f1(pred_timestamp_list, gt_timestamp_list, threshold)
-                self.all_res[th_ratio][bid] = score
+                random_score = self.compute_f1(random_timestamp_list, gt_timestamp_list, threshold)
+                self.all_res[th_ratio][bid] = dict(
+                    score=score,
+                    random_score=random_score
+                )
         for th, scores in self.all_res.items():
             score_list = []
+            random_score_list = []
             for bid, score in scores.items():
-                score_list.append(score)
+                score_list.append(score['score'])
+                random_score_list.append(score['random_score'])
             avg_score = np.asarray(score_list).mean()
-            self.metric[th] = avg_score
+            avg_random_score = np.asarray(random_score_list).mean()
+            self.metric[th] = dict(
+                avg_score=avg_score,
+                random_score=avg_random_score
+            )
 
         return self.metric
 
     @staticmethod
-    def get_idx_from_scores_with_gaussian_smoothing(gaussian_sigma=1, threshold=0.5, seq_indices=None, seq_scores=None):
-        seq_indices = np.array(seq_indices)
-        seq_scores = np.array(seq_scores)
+    def get_idx_from_scores_with_gaussian_smoothing(gaussian_sigma=1, threshold=0.683, seq_indices=None, seq_scores=None):
+
+        score_rank = sorted(seq_scores)
+        seq_scores_percentage = []
+        for idx in range(len(seq_scores)):
+            score = seq_scores[idx]
+            for cnt in range(len(score_rank)):
+                if score <= score_rank[cnt]:
+                    seq_scores_percentage.append(cnt / len(score_rank))
+                    break
+        seq_scores_percentage = np.array(seq_scores_percentage)
+        seq_scores = seq_scores_percentage
+
         gaussian_smt_scores = filters.gaussian_filter1d(seq_scores, gaussian_sigma)
-        #     print(gaussian_smt_scores)
         bdy_indices = []
         internals_indices = []
         for i in range(len(gaussian_smt_scores)):
@@ -356,11 +441,13 @@ class EvalPwl:
                 bdy_indices.append(internals_indices)
 
         bdy_indices_in_video = []
+        center_scores = []
         if len(bdy_indices) != 0:
             for internals in bdy_indices:
                 center = int(np.mean(internals))
                 bdy_indices_in_video.append(seq_indices[center])
-        return bdy_indices_in_video
+                center_scores.append(seq_scores[center])
+        return bdy_indices_in_video, center_scores
 
     def compute_f1(self, pred_timestamp_list, gt_timestamp_list, th):
         if not pred_timestamp_list:
@@ -396,213 +483,23 @@ class EvalPwl:
         return f1
 
 
-def evaluate_on_locating(pred, gt, vid_lengths, outfile=None):
-    Eval = EvalPwl(pred, gt, vid_lengths)
-    metric = Eval.evaluate()
-
-    saved_pred = dict()
-    for bid, datas in pred.items():
-        saved_pred[bid] = dict(
-            time=[float(t) for t in datas['time']],
-            scores=[float(s) for s in datas['scores']],
-            res=[float(t) for t in Eval.pred[bid]]
-        )
-
-    if outfile:
-        for outpath in outfile:
-            if os.path.exists(outpath):
-                os.remove(outpath)
-        with open(outfile[0], 'w') as fp:
-            json.dump(saved_pred, fp, indent=4)
-        with open(outfile[1], 'w') as fp:
-            json.dump(metric, fp, indent=4)
-    else:
-        print(metric)
-
-    return metric
-
-
-class EvalPwl_new:
-    def __init__(self, pred, gt, vid_lengths):
-        self.vid_lengths = vid_lengths
-
-        self.pred = dict()
-        for bid, meta in pred.items():
-            self.pred[bid] = [meta['time'][i] for i in range(len(meta['time'])) if meta['scores'][i] >= 0.5]
-
-        self.gt = dict()
-        for bid, meta in gt.items():
-            self.gt[bid] = meta['timestamp']
-
-        self.th = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]
-        self.all_res = dict()
-        self.metric = dict()
-        for item in self.th:
-            self.all_res[item] = dict()
-
-    def evaluate(self):
-        for bid, gt_timestamp_list in self.gt.items():
-            pred_timestamp_list = self.pred[bid]
-            for th_ratio in self.th:
-                threshold = th_ratio * self.vid_lengths[bid[:11]]
-                score = self.compute_f1(pred_timestamp_list, gt_timestamp_list, threshold)
-                self.all_res[th_ratio][bid] = score
-        for th, scores in self.all_res.items():
-            score_list = []
-            for bid, score in scores.items():
-                score_list.append(score)
-            avg_score = np.asarray(score_list).mean()
-            self.metric[th] = avg_score
-
-        return self.metric
-
-    def compute_f1(self, pred_timestamp_list, gt_timestamp_list, th):
-        if not pred_timestamp_list:
-            return 0
-        num_pos = len(gt_timestamp_list)
-        num_det = len(pred_timestamp_list)
-        assert num_det > 0
-        # calculate distance matrix between a1 and a2, each row represent all detected boundaries
-        dist_matrix = np.zeros((len(gt_timestamp_list), len(pred_timestamp_list)))
-        for b1_idx in range(len(gt_timestamp_list)):
-            dist_matrix[b1_idx] = abs(np.asarray(pred_timestamp_list) - gt_timestamp_list[b1_idx])
-
-        # calculate f1 score based on threshold
-        # count tp, each column represents one threshold
-        tp = 0
-        for b1_idx in range(len(gt_timestamp_list)):
-            min_idx = np.argmin(dist_matrix[b1_idx])
-            if dist_matrix[b1_idx][min_idx] < th:
-                tp += 1
-                for i in range(len(gt_timestamp_list)):
-                    dist_matrix[i][min_idx] = 10000
-
-        # calculate f1
-        fn = num_pos - tp
-        fp = num_det - tp
-        prec = tp / (tp + fp)
-        rec = tp / (tp + fn)
-        if (rec + prec) == 0:
-            f1 = 0
-        else:
-            f1 = 2 * rec * prec / (rec + prec)
-
-        return f1
-
-
-def evaluate_on_locating_new(pred, gt, vid_lengths, outfile=None):
-    Eval = EvalPwl_new(pred, gt, vid_lengths)
-    metric = Eval.evaluate()
-
-    saved_pred = dict()
-    for bid, datas in pred.items():
-        saved_pred[bid] = dict(
-            time=[float(t) for t in datas['time']],
-            scores=[float(s) for s in datas['scores']],
-            res=[float(t) for t in Eval.pred[bid]]
-        )
-
-    if outfile:
-        for outpath in outfile:
-            if os.path.exists(outpath):
-                os.remove(outpath)
-        with open(outfile[0], 'w') as fp:
-            json.dump(saved_pred, fp, indent=4)
-        with open(outfile[1], 'w') as fp:
-            json.dump(metric, fp, indent=4)
-    else:
-        print(metric)
-
-    return metric
-
-
-class EvalPwl_2stream:
-    def __init__(self, pred, vid_lengths):
-        self.pred = pred
-        self.vid_lengths = vid_lengths
-
-        self.th = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]
-        self.all_res = dict()
-        self.metric = dict()
-        for item in self.th:
-            self.all_res[item] = dict()
-
-    def evaluate(self):
-        for bid, meta in self.pred.items():
-            time_rank = [x for _, x in sorted(zip(meta['score'], meta['proposals']), reverse=True)]
-            random_time_rank = copy.deepcopy(time_rank)
-            random.shuffle(random_time_rank)
-            time_gt = meta['gt']
-            for th_ratio in self.th:
-                th = th_ratio * self.vid_lengths[bid[:11]]
-                score, random_score = self.compute_mAP(time_rank, random_time_rank, time_gt, th)
-                self.all_res[th_ratio][bid] = dict(
-                    score=score,
-                    random=random_score
-                )
-
-        for th, scores in self.all_res.items():
-            score_list = []
-            random_list = []
-            for bid, meta in scores.items():
-                score_list.append(meta['score'])
-                random_list.append(meta['random'])
-            avg_score = np.asarray(score_list).mean()
-            random_score = np.asarray(random_list).mean()
-            self.metric[th] = dict(
-                score=avg_score,
-                random=random_score
-            )
-
-        return self.metric
-
-    def compute_mAP(self, time_rank, random_time_rank, time_gt, th):
-        cnt = 0
-        matched = False
-        for idx in range(len(time_rank)):
-            if matched:
-                break
-            timestamp = time_rank[idx]
-            cnt += 1
-            for gt in time_gt:
-                if abs(timestamp - gt) <= th:
-                    matched = True
-
-        score = 1 / cnt if matched else 0
-
-        cnt = 0
-        matched = False
-        for idx in range(len(random_time_rank)):
-            if matched:
-                break
-            timestamp = random_time_rank[idx]
-            cnt += 1
-            for gt in time_gt:
-                if abs(timestamp - gt) <= th:
-                    matched = True
-
-        random_score = 1 / cnt if matched else 0
-
-        return score, random_score
-
-
-def evaluate_on_locating2stream(pred, vid_lengths, outfile=None):
-    Eval = EvalPwl_2stream(pred, vid_lengths)
+def evaluate_grounding(pred, vid_lengths, mode, outfile=None):
+    Eval = EvalGrd(pred, vid_lengths, mode)
     metric = Eval.evaluate()
 
     saved_pred = dict()
     for bid, datas in pred.items():
         saved_pred[bid] = dict(
             proposals=[float(t) for t in datas['proposals']],
-            scores=[float(s) for s in datas['score']],
+            scores=[float(s) for s in datas['scores']],
             gt=[float(g) for g in datas['gt']]
         )
 
     saved_metric = dict()
     for th, meta in metric.items():
         saved_metric[th] = dict(
-            score=float(metric[th]['score']),
-            random=float(metric[th]['random'])
+            score=float(metric[th]['avg_score']),
+            random=float(metric[th]['random_score'])
         )
 
     if outfile:
