@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="c3D6sUVoeo92yWwHxUyhO9S30wuc-B03I0UDaZDwiRs" />
+    <title>[ECCV 2022] GEB+: A Benchmark for Generic Event Boundary Captioning, Grounding and Retrieval</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="icon" href="figures/showlab.png" type="image/png">
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 20px;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .download-btn {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">GEB+ Dataset</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#download">Download</a></li>
+                <li class="nav-item"><a class="nav-link" href="#baseline">Baseline Models</a></li>
+                <li class="nav-item"><a class="nav-link" href="#citation">Citation</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- 主体内容 -->
+<div class="container">
+    <h1 class="title">GEB+: A Benchmark for Generic Event Boundary Captioning, Grounding and Retrieval</h1>
+    
+    <p class="text-center">
+        <strong>ECCV 2022</strong> | <a href="https://arxiv.org/abs/2204.00486">[arXiv]</a> | 
+        <a href="https://arxiv.org/pdf/2204.00486.pdf">[PDF]</a> | <a href="https://github.com/Yuxuan-W/GEB-plus">[Code]</a>
+    </p>
+
+    <p class="text-center">
+        <a href="https://yuxuanw.me">Yuxuan Wang</a>, 
+        <a href="https://scholar.google.com/citations?user=No9OsocAAAAJ&hl=en">Difei Gao</a>, 
+        <a href="https://lichengunc.github.io">Licheng Yu</a>, 
+        Stan Weixian Lei, Matt Feiszli, 
+        <a href="https://sites.google.com/view/showlab">Mike Zheng Shou</a>
+    </p>
+
+    <p class="text-center">
+        <strong>Showlab</strong>, National University of Singapore and
+        <strong>Meta AI</strong>
+    </p>
+
+    <p>
+        The <strong>Kinetics-GEB+</strong> dataset consists of 170K boundaries with captions describing status changes in 12K videos.
+        We propose three tasks: <strong>Boundary Captioning</strong>, <strong>Boundary Grounding</strong>, and <strong>Boundary Caption-Video Retrieval</strong>.
+    </p>
+
+    <img src="figures/Cover.png" class="img-fluid mx-auto d-block" alt="GEB+ Cover Image">
+
+    <hr>
+
+    <!-- 下载部分 -->
+    <h2 id="download">📥 Download</h2>
+    <p>We provide both <strong>video frames</strong> and <strong>boundary annotations</strong> for ease of use.</p>
+
+    <h4>Video Frames (Newly Released!)</h4>
+    <a href="https://entuedu-my.sharepoint.com/:u:/g/personal/yuxuan003_e_ntu_edu_sg/EQBGnIiM3PpGs8VxfptwbIgBYnur9vuSpThH6qxUaQOU7w?e=DBAdkX" class="btn btn-primary download-btn">Download Frames</a>
+    <p></p>
+    <h4>Boundary Annotations</h4>
+    <p><strong>Filtered boundaries (Recommended)</strong> (40K boundaries used in our paper and following works)</p>
+    <a href="https://entuedu-my.sharepoint.com/:f:/g/personal/yuxuan003_e_ntu_edu_sg/EgjogzMe_H5KquTEF7YaG0ABCpIF6rGFbaSSl1FVntfE9g?e=1wUtBt" class="btn btn-success download-btn">Download Filtered Annotations</a>
+    <p></p>
+    <p><strong>Raw Annotations</strong> (170K boundaries)</p>
+    <a href="https://entuedu-my.sharepoint.com/:f:/g/personal/yuxuan003_e_ntu_edu_sg/EpLQLIbuoIVLhw3jHoEtyxsBoDt3sJfNr2m6LQyAPahsqg?e=C3ACFz" class="btn btn-danger download-btn">Download Raw Annotations</a>
+
+    <hr>
+
+    <!-- 基线模型部分 -->
+    <h3 id="baseline">🛠 Using Our Baseline Models</h3>
+    <p></p>
+    <p>Due to rapid advancements in video understanding, we recommend using only our dataset annotations and video frames.</p>
+    <p>Please refer to our <a href="https://github.com/Yuxuan-W/GEB-plus">Github repository</a> for more details.</p>
+
+    <details>
+        <summary><strong>Click to Expand: Training Instructions</strong></summary>
+        <p>To train our <strong>Boundary Captioning</strong> model:</p>
+        <code>python run_captioning.py --do_train --do_test --do_eval --ablation obj --evaluate_during_training</code>
+
+        <p>To train our <strong>Boundary Grounding</strong> model:</p>
+        <code>python run_grounding.py --do_train --do_test --do_eval --ablation obj --evaluate_during_training</code>
+
+        <p>To train our <strong>Boundary Caption-Text Retrieval</strong> model:</p>
+        <code>python run_retrieval.py --do_train --do_test --do_eval --ablation obj --evaluate_during_training</code>
+    </details>
+
+    <hr>
+
+    <!-- 论文引用部分 -->
+    <h3 id="citation">📜 Citation</h3>
+    <p></p>
+    <p>If you find our work helps, please cite our paper:</p>
+    <pre>
+        @article{wang2022generic,
+        title={Generic Event Boundary Captioning: A Benchmark for Status Changes Understanding},
+        author={Wang, Yuxuan and Gao, Difei and Yu, Licheng and Lei, Stan Weixian and Feiszli, Matt and Shou, Mike Zheng},
+        journal={arXiv preprint arXiv:2204.00486},
+        year={2022}
+        }
+    </pre>
+
+    <hr>
+
+    <!-- 致谢部分 -->
+    <h3>🙏 Acknowledgement</h3>
+    <p></p>
+     <p>Thanks to <a href="https://scholar.google.com/citations?user=No9OsocAAAAJ&hl=en">Difei Gao</a>,
+        <a href="https://lichengunc.github.io">Licheng Yu</a>, and the great efforts contributed by other excellent staffs from 
+        <a href="https://ai.facebook.com">Meta AI</a>.
+     </p>
+ 
+     <p>Thanks to the amazing YouTube artists for creating these videos and the contributors of the original 
+        <strong>Kinetics-400</strong> dataset.
+     </p>
+ 
+     <p>
+         This project is supported by the National Research Foundation, Singapore under its NRFF Award NRF-NRFF13-2021-0008, 
+         and <a href="https://sites.google.com/view/showlab">Mike Zheng Shou</a>'s Start-Up Grant from NUS. 
+         The computational work for this article was partially performed on resources of the 
+         National Supercomputing Centre, Singapore.
+     </p>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
