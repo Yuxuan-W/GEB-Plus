@@ -1,10 +1,35 @@
-# [ECCV 2022] GEB+: A Benchmark for Generic Event Boundary Captioning, Grounding and Retrieval
-Official Site for 
-[GEB+: A Benchmark for Generic Event Boundary Captioning, Grounding and Retrieval](https://arxiv.org/abs/2204.00486), ECCV 2022
+<p align="center">
+  <img src="figures/showlab.png" align="center" width="10%">
+  
+  <h2 align="center"><strong>[ECCV 2022] GEB+: A Benchmark for Generic Event Boundary Captioning, Grounding and Retrieval</strong></h2>
 
-[[Homepage](https://yuxuan-w.github.io/GEB-plus/)][[PDF](https://arxiv.org/pdf/2204.00486.pdf)]
+  <p align="center">
+    <a href='https://yuxuanw.me'>Yuxuan Wang</a><sup>1</sup>,</span>
+    <a href='https://scholar.google.com/citations?user=No9OsocAAAAJ&hl=en'>Difei Gao</a><sup>1</sup>,</span>
+    <a href='https://lichengunc.github.io'>Licheng Yu</a><sup>2</sup>,</span>
+    Stan Weixian Lei<sup>1</sup>,</span>
+    Matt Feiszli<sup>2</sup>,</span>
+    <a href='https://sites.google.com/view/showlab'>Mike Zheng Shou</a><sup>1</sup>,</span>
+    <br>
+    <sup>1</sup>Showlab, National University of Singapore,
+    <sup>2</sup>Meta AI,
+</p>
 
-[Yuxuan Wang](https://yuxuanw.me), [Difei Gao](https://scholar.google.com/citations?user=No9OsocAAAAJ&hl=en), [Licheng Yu](https://lichengunc.github.io), Stan Weixian Lei, Matt Feiszli, and [Mike Zheng Shou](https://sites.google.com/view/showlab)
+<div align="center">
+
+<a href='https://yuxuan-w.github.io/GEB-plus/'><img src='https://img.shields.io/badge/Home-Website-green'></a> 
+<a href='https://arxiv.org/abs/2204.00486'><img src='https://img.shields.io/badge/arXiv-2204.00486-b31b1b.svg'></a> 
+
+</div>
+
+<!-- # [ECCV 2022] GEB+: A Benchmark for Generic Event Boundary Captioning, Grounding and Retrieval -->
+<!-- Official Site for 
+[GEB+: A Benchmark for Generic Event Boundary Captioning, Grounding and Retrieval](https://arxiv.org/abs/2204.00486), ECCV 2022 -->
+
+<!-- <a href='https://yuxuan-w.github.io/GEB-plus/'><img src='https://img.shields.io/badge/Home-Website-blue'></a> 
+<a href='https://arxiv.org/abs/2204.00486'><img src='https://img.shields.io/badge/arXiv-2204.00486-b31b1b.svg'></a> 
+
+[Yuxuan Wang](https://yuxuanw.me), [Difei Gao](https://scholar.google.com/citations?user=No9OsocAAAAJ&hl=en), [Licheng Yu](https://lichengunc.github.io), Stan Weixian Lei, Matt Feiszli, and [Mike Zheng Shou](https://sites.google.com/view/showlab) -->
 
 **Updated in Jan. 2025:** 
 For convenience, we provide downloads of **video frames** and our boundaries. 
